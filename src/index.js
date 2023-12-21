@@ -291,28 +291,27 @@ export class Message extends WhatsappJS {
         this.sender_phone_number = data.remote_phone_number;
         this.client_phone_number = data.channel_phone_number;
         this.sent_by = data.sent_by;
-        this.reply = (content) => {
-            var data = JSON.stringify({
-                to_number: this.sender_phone_number,
-                from_number: this.client_phone_number,
-                text: content,
-            });
-    
-            var config = {
-                method: 'post',
-                url: 'https://api.p.2chat.io/open/whatsapp/send-message',
-                headers: {
-                    'X-User-API-Key': this.client_key,
-                    'Content-Type': 'application/json',
-                },
-                data: data,
-            };
-    
-            axios(config).catch(function (error) {
-                console.log("hata");
-            });
-        }
     }
 
-    
+    async reply(content) {
+        var data = JSON.stringify({
+            to_number: this.sender_phone_number,
+            from_number: this.client_phone_number,
+            text: content,
+        });
+
+        var config = {
+            method: 'post',
+            url: 'https://api.p.2chat.io/open/whatsapp/send-message',
+            headers: {
+                'X-User-API-Key': this.client_key,
+                'Content-Type': 'application/json',
+            },
+            data: data,
+        };
+
+        axios(config).catch(function (error) {
+            console.log("hata");
+        });
+    }
 }
