@@ -79,7 +79,7 @@ export class WhatsappJS extends EventEmitter {
                 this.site = number.site;
                 this.timezone_phone_number = number.timezone_phone_number;
 
-                this.emit('ready', number);
+                this.emit('ready', new WhatsappJS(this.client_key, this.phone_number));
             } else {
                 throw new Error(`Client cannot connect to servers.`);;
             }
