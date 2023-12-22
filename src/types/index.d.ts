@@ -45,6 +45,10 @@ export class WhatsappJS {
         event: U, listener: EventEmitterEvents[U]
     ): this;
 
+    once<U extends keyof EventEmitterEvents>(
+        event: U, listener: EventEmitterEvents[U]
+    ): this;
+
     private emit<U extends keyof EventEmitterEvents>(
         event: U, ...args: Parameters<EventEmitterEvents[U]>
     ): boolean;
