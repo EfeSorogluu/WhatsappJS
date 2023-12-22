@@ -7,6 +7,8 @@
   "author": "EfeSorogluu <sorolu14@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "body-parser": "^1.20.2"
+    "axios": "^1.6.2",
+    "body-parser": "^1.20.2",
+    "express": "^4.18.2"
   }
 }
