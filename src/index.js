@@ -4,11 +4,6 @@ import bodyParser from "body-parser";
 import EventEmitter from 'events';
 
 export class WhatsappJS extends EventEmitter {
-    /**
-     * 
-     * @param {string} API_KEY 
-     * @param {string} PHONE_NUMBER
-     */
     constructor (API_KEY, PHONE_NUMBER) {
         super();
         this.client_key = API_KEY;
@@ -53,11 +48,6 @@ export class WhatsappJS extends EventEmitter {
         }
     }
 
-    /**
-     * 
-     * @param {WebhookConfig} config 
-     * 
-     */
     async webhookServer(config) {
         try {
             if(config.events.length <= 0) throw new Error("Please include one or more event!");
@@ -130,26 +120,10 @@ export class WhatsappJS extends EventEmitter {
                 let data = req.body;
 
                 if (data.sent_by == 'user') {
-                    /**
-                     * @type {Message}
-                     */
-                    const eventData = new Message(data, this.client_key);
+                    const eventData = new Message(data, this.client_key, this.client_phone);
                     this.emit('message', eventData);
                 } else if(data.sent_by == 'api') {
-                    /**
-                     * @type {SentMessageEventData}
-                     */
-                    const eventData = {
-                        id: data.id,
-                        uuid: data.uuid,
-                        created_at: data.created_at,
-                        session_key: data.session_key,
-                        message: data.message,
-                        sended_phone_number: data.remote_phone_number,
-                        client_phone_number: data.channel_phone_number,
-                        sent_by: data.sent_by 
-                    };
-                    this.emit('sent_message', eventData);
+                    this.emit('sent_message', new Message(data, this.client_key, this.client_phone));
                 }
 
                 res.sendStatus(200);
@@ -159,13 +133,6 @@ export class WhatsappJS extends EventEmitter {
         }
     }
 
-    /**
-     * 
-     * @param {Types.ReceiverPhone} to 
-     * @param {MessageTypes.Text} text 
-     * @param {MessageOptions}
-     * 
-     */
     async sendMessage(to, text, options) {
         var data = {
             "to_number": to,
@@ -193,11 +160,6 @@ export class WhatsappJS extends EventEmitter {
           });
     }
 
-    /**
-     * 
-     * @param {PhoneTypes.Receiver} phone_number 
-     * @returns 
-     */
     async checkNumber(phone_number) {
         var config = {
             method: 'get',
@@ -240,52 +202,8 @@ export class WhatsappJS extends EventEmitter {
     }
 }
 
-export const Events = {
-    CallReceived            : "whatsapp.call.received",
-    NewMessage              : "whatsapp.message.new",
-    MessageReceived         : "whatsapp.message.received",
-    MessageSent             : "whatsapp.message.sent",
-    NewConversation         : "whatsapp.conversation.new",
-    AudioTranscribed        : "whatsapp.audio.transcribed",
-    GroupMessageReceived    : "whatsapp.group.message.received",
-    GroupJoin               : "whatsapp.group.join",
-    GroupLeave              : "whatsapp.group.leave",
-    GroupRemove             : "whatsapp.group.remove"
-};
-
-export class WebhookConfig {
-    port        = 3000;
-    path        = "/webhooks/whatsapp";
-    host_name   = "required";
-    events      = [];
-    public  = {
-        name: "",
-        path: ""
-    };
-};
-
-export class PhoneTypes {
-    /**
-     * @description Receiver phone number.
-     */
-    Receiver = "0";
-    /**
-     * @description 10 Digits phone number with country code
-     */
-    PhoneNumber = "String";
-};
-
-export class MessageTypes {
-    Text = "string";
-    URL = "string";
-}
-
-export class MessageOptions {
-    file_url = "";
-}
-
 export class Message extends WhatsappJS {
-    constructor(data, API_KEY) {
+    constructor(data, API_KEY, PHONE) {
         super();
         this.client_key = API_KEY;
 
@@ -306,11 +224,7 @@ export class Message extends WhatsappJS {
         this.sent_by = data.sent_by;
     }
 
-    /**
-     * 
-     * @param {MessageTypes.MessageText} content 
-     * @param {MessageOptions} options 
-     */
+
     async reply(content, options) {
         var data = {
             to_number: this.sender_phone_number,
@@ -338,6 +252,57 @@ export class Message extends WhatsappJS {
         } catch (error) {
             console.log(error.request.data)
             throw new Error(`Some error on request.\n${error}`);
+        }
+    }
+
+    async sendMessage(to, text, options) {
+        var data = {
+            "to_number": to,
+            "from_number": this.client_phone,
+            "text": text
+          }
+
+        if (options && options.file_url) {
+            data.url = options.file_url;
+        }
+          
+        var config = {
+            method: 'post',
+            url: 'https://api.p.2chat.io/open/whatsapp/send-message',
+            headers: { 
+              'X-User-API-Key': this.client_key, 
+              'Content-Type': 'application/json'
+            },
+            data : JSON.stringify(data)
+        };
+          
+        axios(config)
+          .catch(function (error) {
+            throw new Error(`Some error on request.\n${error}`);
+          });
+    }
+
+    async checkNumber(phone_number) {
+        var config = {
+            method: 'get',
+            url: `https://api.p.2chat.io/open/whatsapp/check-number/${this.client_phone}/${phone_number}`,
+            headers: { 
+              'X-User-API-Key': this.client_key
+            }
+        };
+        
+        try {
+            const res = await axios(config);
+        
+            if(!res.data.is_valid) {
+                return "Invalid phone number!";
+            } else if(!res.data.on_whatsapp) {
+                return false;
+            } else {
+                return res.data;
+            }
+        } catch (e) {
+            console.error(e);
         }
     }
 }

@@ -1,12 +1,25 @@
+interface EventEmitterEvents {
+    'ready': (client: WhatsappJS) => void;
+    'message': (message: Message) => void;
+    'sent': (message: Message) => void;
+}
+
 export class WhatsappJS {
     constructor(API_KEY: string, PHONE_NUMBER: string);
-    client_key: string;
-    client_phone: string;
+    private client_key: string;
+    private client_phone: string;
     start(): Promise<void>;
     webhookServer(config: WebhookConfig): Promise<void>;
     sendMessage(to: PhoneTypes["Receiver"], text: MessageTypes["Text"], options: MessageOptions): Promise<void>;
     checkNumber(phone_number: PhoneTypes["Receiver"]): Promise<any>;
-    getHooks(): Promise<any>;
+    private getHooks(): Promise<any>;
+    on<U extends keyof EventEmitterEvents>(
+        event: U, listener: EventEmitterEvents[U]
+    ): this;
+
+    private emit<U extends keyof EventEmitterEvents>(
+        event: U, ...args: Parameters<EventEmitterEvents[U]>
+    ): boolean;
 }
 
 export type WebhookEvents =
@@ -46,24 +59,37 @@ export interface MessageOptions {
     file_url: string;
 }
 
-export class Message extends WhatsappJS {
-    constructor(data: any, API_KEY: any);
-    client_key: WhatsappJS["client_key"];
-    id: string;
-    uuid: string;
-    created_at: string;
-    session_key: string;
-    message: {
-        text: string;
-        media: {
-            url: string;
-            type: string;
-            mime_type: string;
-        };
-    };
-    sender_phone_number: string;
-    client_phone_number: string;
-    sent_by: string;
+export interface CheckNumberResponse {
+    is_valid: boolean,
+    number: {
+        iso_country_code: string,
+        region: string,
+        carrier?: string,
+        timezone: string[]
+    },
+    on_whatsapp: boolean,
+    whatsapp_info?: {
+        is_business?: boolean,
+        is_enterprise?: boolean,
+        profile_pic?: string,
+        verified_level?: number,
+        verified_name?: string
+    }
+}
 
+export class Message {
+    constructor(data: any, API_KEY: any);
+    public id: string;
+    public uuid: string;
+    public created_at: string;
+    public session_key: string;
+    public message: { text?: string; media?: { url: string; type: string; mime_type: string; }; };
+    public sender_phone_number: string;
+    public client_phone_number: string;
+    public sent_by: string;
+    private client_key: WhatsappJS["client_key"];
+
+    checkNumber(phone_number: PhoneTypes["Receiver"]): Promise<string | boolean | CheckNumberResponse>;
+    sendMessage(to: PhoneTypes["Receiver"], text: MessageTypes["Text"], options: MessageOptions): Promise<void>;
     reply(content: MessageTypes["Text"], options: MessageOptions): Promise<void>;
 }
