@@ -1,5 +1,3 @@
-'use strict';
-
 import axios from "axios";
 import express from 'express';
 import bodyParser from "body-parser";
@@ -62,6 +60,7 @@ export class WhatsappJS extends EventEmitter {
      */
     async webhookServer(config) {
         try {
+            if(config.events.length <= 0) throw new Error("Please include one or more event!");
             let path = config.path || new WebhookConfig().path;
             let port = config.port || new WebhookConfig().port;
             
@@ -71,8 +70,14 @@ export class WhatsappJS extends EventEmitter {
             app.use(bodyParser.text());
             app.use(bodyParser.urlencoded({ extended: true }));
 
+            if(config.public) {
+                if(!config.public.path || !config.public.name) throw new Error("Webhook public path and name required!");
+
+                app.use(config.public.name, express.static(config.public.path))
+            }
+
             app.listen(port, () => {
-                console.log(`🚀 Webhook server running on ${port}! Hook URL: ${config.host_name}${path}`);
+                console.log(`🚀 Webhook server running on ${port}! Webhook URL: ${config.host_name}${path}`);
             });
 
             const hooks = await this.getHooks();
@@ -157,14 +162,20 @@ export class WhatsappJS extends EventEmitter {
     /**
      * 
      * @param {Types.ReceiverPhone} to 
-     * @param {Types.MessageContentText} text 
+     * @param {MessageTypes.Text} text 
+     * @param {MessageOptions}
+     * 
      */
-    async sendMessage(to, text) {
-        var data = JSON.stringify({
+    async sendMessage(to, text, options) {
+        var data = {
             "to_number": to,
             "from_number": this.client_phone,
             "text": text
-          });
+          }
+
+        if (options && options.file_url) {
+            data.url = options.file_url;
+        }
           
         var config = {
             method: 'post',
@@ -173,7 +184,7 @@ export class WhatsappJS extends EventEmitter {
               'X-User-API-Key': this.client_key, 
               'Content-Type': 'application/json'
             },
-            data : data
+            data : JSON.stringify(data)
         };
           
         axios(config)
@@ -184,7 +195,7 @@ export class WhatsappJS extends EventEmitter {
 
     /**
      * 
-     * @param {Types.PhoneNumber} phone_number 
+     * @param {PhoneTypes.Receiver} phone_number 
      * @returns 
      */
     async checkNumber(phone_number) {
@@ -247,22 +258,31 @@ export class WebhookConfig {
     path        = "/webhooks/whatsapp";
     host_name   = "required";
     events      = [];
+    public  = {
+        name: "",
+        path: ""
+    };
 };
 
-export class Types {
+export class PhoneTypes {
     /**
      * @description Receiver phone number.
      */
-    ReceiverPhone = "0";
-    /**
-     * @description Message content.
-     */
-    MessageContentText = "String";
+    Receiver = "0";
     /**
      * @description 10 Digits phone number with country code
      */
     PhoneNumber = "String";
 };
+
+export class MessageTypes {
+    Text = "string";
+    URL = "string";
+}
+
+export class MessageOptions {
+    file_url = "";
+}
 
 export class Message extends WhatsappJS {
     constructor(data, API_KEY) {
@@ -286,12 +306,22 @@ export class Message extends WhatsappJS {
         this.sent_by = data.sent_by;
     }
 
-    async reply(content) {
-        var data = JSON.stringify({
+    /**
+     * 
+     * @param {MessageTypes.MessageText} content 
+     * @param {MessageOptions} options 
+     */
+    async reply(content, options) {
+        var data = {
             to_number: this.sender_phone_number,
             from_number: this.client_phone_number,
             text: content,
-        });
+        };
+
+        // Eğer options içinde file_url varsa, data nesnesine url ekleyin
+        if (options && options.file_url) {
+            data.url = options.file_url;
+        }
 
         var config = {
             method: 'post',
@@ -300,11 +330,14 @@ export class Message extends WhatsappJS {
                 'X-User-API-Key': this.client_key,
                 'Content-Type': 'application/json',
             },
-            data: data,
+            data: JSON.stringify(data), // data nesnesini JSON.stringify ile dönüştürün
         };
 
-        axios(config).catch(function (error) {
+        try {
+            await axios(config);
+        } catch (error) {
+            console.log(error.request.data)
             throw new Error(`Some error on request.\n${error}`);
-        });
+        }
     }
 }
