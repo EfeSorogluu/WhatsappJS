@@ -30,7 +30,7 @@ Below is an example:
 ```
 import { WhatsappJS } from '@efesoroglu/whatsappjs'
 
-const  client  =  new  WhatsappJS("<your-api-key>", "<channel-phone-number>");
+const  client = new  WhatsappJS("<your-api-key>", "<channel-phone-number>");
 
 client.start();
 ```
@@ -42,7 +42,7 @@ Below is an example:
 ```
 import { WhatsappJS } from '@efesoroglu/whatsappjs'
 
-const  client  =  new  WhatsappJS("<your-api-key>", "<channel-phone-number>");
+const client = new  WhatsappJS("<your-api-key>", "<channel-phone-number>");
 
 client.on('ready', (client) => {
 	console.log(`The bot started with the name ${client.friendly_name} (${client.phone_number})!`);
@@ -64,8 +64,8 @@ const  client  =  new  WhatsappJS("<your-api-key>", "<channel-phone-number>");
 
 client.webhookServer({
 	port:  8080,
-	events: [Events.NewMessage, Events.MessageSent],
-	host_name:  "https://dbb8-151-250-211-66.ngrok-free.app",
+	events: ["whatsapp.message.new"],
+	host_name:  "https://<your_sub>.ngrok-free.app",
 });
 
 client.on('ready', (client) => {
