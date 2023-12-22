@@ -48,11 +48,10 @@ export class WhatsappJS extends EventEmitter {
 
                 this.emit('ready', number);
             } else {
-                throw console.log("Bot can't connect to servers.");
+                throw new Error(`Client cannot connect to servers.`);;
             }
         } catch (e) {
-            console.log(e)
-            return console.error("Bot can't connect to servers.");
+            throw new Error(`Some error on request.\n${error}`);
         }
     }
 
@@ -90,11 +89,8 @@ export class WhatsappJS extends EventEmitter {
                 };
                   
                 axios.request(config)
-                  .then((response) => {
-                    
-                  })
                   .catch((error) => {
-                    console.log(error);
+                    throw new Error(`Some error on request.\n${error}`);
                   });
             });
 
@@ -119,9 +115,6 @@ export class WhatsappJS extends EventEmitter {
                     };
     
                     axios(request_config)
-                        .then(function (response) {
-                            console.log(`${event} successfuly subscribed!`);
-                        })
                         .catch(e => {
                             console.error(e);
                         });
@@ -185,7 +178,7 @@ export class WhatsappJS extends EventEmitter {
           
         axios(config)
           .catch(function (error) {
-            console.log(error);
+            throw new Error(`Some error on request.\n${error}`);
           });
     }
 
@@ -311,7 +304,7 @@ export class Message extends WhatsappJS {
         };
 
         axios(config).catch(function (error) {
-            console.log("hata");
+            throw new Error(`Some error on request.\n${error}`);
         });
     }
 }
