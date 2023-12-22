@@ -1,5 +1,5 @@
 {
-  "name": "whatsappjs",
+  "name": "@efesoroglu/whatsappjs",
   "version": "1.0.0",
   "description": "WhatsappJS is a library where you can create bots and answering machines using the 2Chat API!",
   "main": "src/index.js",
