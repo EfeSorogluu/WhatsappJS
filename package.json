@@ -3,6 +3,7 @@
   "version": "1.0.1",
   "description": "WhatsappJS is a library where you can create bots and answering machines using the 2Chat API!",
   "main": "src/index.js",
+  "type": "module",
   "repository": "https://github.com/EfeSorogluu/WhatsappJS.git",
   "author": "EfeSorogluu <sorolu14@gmail.com>",
   "license": "Apache-2.0",
