@@ -91,8 +91,8 @@ export class WhatsappJS extends EventEmitter {
     async webhookServer(config) {
         try {
             if(config.events.length <= 0) throw new Error("Please include one or more event!");
-            let path = config.path || new WebhookConfig().path;
-            let port = config.port || new WebhookConfig().port;
+            let path = config.path || "/webhooks/whatsapp";
+            let port = config.port || 3000;
             
             const app = express();
 
