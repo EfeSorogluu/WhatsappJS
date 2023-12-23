@@ -158,15 +158,15 @@ export class WhatsappJS extends EventEmitter {
 
             app.post(path, (req, res) => {
                 let data = req.body;
-
-                if (data.sent_by == 'user') {
+    
+                if (data.sent_by == 'user' && !data.participant) {
                     const eventData = new Message(data, this.client_key, this.client_phone);
                     this.emit('message', eventData);
-                } else if(data.sent_by == 'api') {
+                } else if(data.sent_by == 'api' && !data.participant) {
                     this.emit('sent_by_api', new APIMessage(data, this.client_key, this.client_phone));
-                } else if(data.sent_by == 'agent') {
+                } else if(data.sent_by == 'agent' && !data.participant) {
                     this.emit('sent_by_agent', new AgentMessage(data, this.client_key, this.client_phone));
-                } else if(data.participant) {
+                } else if(typeof data.participant == "object") {
                     this.emit('group_message', new GroupMessage(data, this.client_key, this.client_phone))
                 }
 
@@ -301,7 +301,7 @@ export class Message extends WhatsappJS {
             text: content,
         };
 
-        // Eğer options içinde file_url varsa, data nesnesine url ekleyin
+
         if (options && options.file_url) {
             data.url = options.file_url;
         }
@@ -401,7 +401,7 @@ export class GroupMessage extends WhatsappJS {
             text: content,
         };
 
-        // Eğer options içinde file_url varsa, data nesnesine url ekleyin
+
         if (options && options.file_url) {
             data.url = options.file_url;
         }
