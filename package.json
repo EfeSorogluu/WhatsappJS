@@ -6,7 +6,7 @@
   "types": "./src/types/index.d.ts",
   "type": "module",
   "repository": "https://github.com/EfeSorogluu/WhatsappJS.git",
-  "homepage": "https://whatsappjs.gitbook.io/home",
+  "homepage": "https://whatsappjs.gitbook.io/docs",
   "author": "EfeSorogluu <sorolu14@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {

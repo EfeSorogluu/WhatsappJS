@@ -159,4 +159,4 @@ client.webhookServer({
 
   
 
-As you can see, the Events class is called and the Events in it are selected. You can take a look at [2Chat Documentation](https://developers.2chat.co/docs/API/WhatsApp/webhooks/subscribe) to learn which Event does what.
+As you can see, the Events class is called and the Events in it are selected. You can take a look at [Documentation](https://whatsappjs.gitbook.io/docs/events) to learn which Event does what.
