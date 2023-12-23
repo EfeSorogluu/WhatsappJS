@@ -84,7 +84,7 @@ import { WhatsappJS } from '@efesoroglu/whatsappjs'
 const client = new WhatsappJS("<your-api-key>", "<channel-phone-number>");
 
 client.once('ready', (client) => {
-	console.log(`The bot started with the name ${client.friendly_name} (${client.phone_number})!`);
+	console.log(`The bot started with the name ${client.client_name} (${client.phone_number})!`);
 });
 
   
@@ -124,7 +124,7 @@ client.webhookServer({
   
 
 client.once('ready', (client) => {
-	console.log(`The bot started with the name ${client.friendly_name} (${client.phone_number})!`);
+	console.log(`The bot started with the name ${client.client_name} (${client.phone_number})!`);
 });
 
   
