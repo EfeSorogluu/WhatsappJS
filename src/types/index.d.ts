@@ -36,9 +36,11 @@ export class WhatsappJS {
     public timezone_phone_number: string;
 
     start(): Promise<void>;
-    webhookServer(config: WebhookConfig): Promise<void>;
+    webhookServer(config: WebhookConfig): Promise<WebhookConfig>;
     sendMessage(to: PhoneTypes["Receiver"], text: MessageTypes["Text"], options: MessageOptions): Promise<void>;
-    checkNumber(phone_number: PhoneTypes["Receiver"]): Promise<any>;
+    checkNumber(phone_number: PhoneTypes["Receiver"]): Promise<CheckNumberTypes>;
+    getGroupByUUID(uuid: string): Promise<Group>;
+    getGroups(): Promise<Group[]>;
     private getHooks(): Promise<any>;
 
     on<U extends keyof EventEmitterEvents>(
@@ -71,12 +73,12 @@ export interface WebhookConfig {
      * @description Web Port (Default: 3000)
      * @default port: 3000
      */
-  port: number;
+  port?: number;
   /**
    * @description Path to POST webhook events (default: /webhooks/whatsapp)
    * @default path: "/webhooks/whatsapp"
    */
-  path: string;
+  path?: string;
   /**
    * @description Your server hostname or the connection address from a service provider such as ngrok. For example: https://<your_url>.ngrok-free.app
    * @example host_name: "https://<your_url>.ngrok-free.app"
@@ -86,7 +88,7 @@ export interface WebhookConfig {
    * @description Adds the events you want to listen to to the webhook. You can read the 2Chat API Documentation to learn more about events: https://developers.2chat.co/docs/API/WhatsApp/webhooks/subscribe
    */
   events: WebhookEvents[];
-  public: {
+  public?: {
     /**
      * @description The name under which your public file will be published and publicly visible on the web server.
      * @example name: "/public"
@@ -132,6 +134,8 @@ export interface CheckNumberResponse {
     }
 }
 
+export type CheckNumberTypes = | "invalid_phone_number" | boolean | CheckNumberResponse;
+
 export interface Group {
     uuid: string,
     channel_uuid: string,
@@ -168,7 +172,7 @@ export class Message {
     public sent_by: string;
     private client_key: WhatsappJS["client_key"];
 
-    checkNumber(phone_number: PhoneTypes["Receiver"]): Promise<string | boolean | CheckNumberResponse>;
+    checkNumber(phone_number: PhoneTypes["Receiver"]): Promise<CheckNumberTypes>;
     sendMessage(to: PhoneTypes["Receiver"], text: MessageTypes["Text"], options: MessageOptions): Promise<void>;
     reply(content: MessageTypes["Text"], options: MessageOptions): Promise<void>;
 }
@@ -187,7 +191,7 @@ export class GroupMessage {
     public participants: { phone_number: PhoneTypes["Receiver"], device: string, pushname: string }
     private client_key: WhatsappJS["client_key"];
 
-    checkNumber(phone_number: PhoneTypes["Receiver"]): Promise<string | boolean | CheckNumberResponse>;
+    checkNumber(phone_number: PhoneTypes["Receiver"]): Promise<CheckNumberTypes>;
     sendMessage(to: PhoneTypes["Receiver"], text: MessageTypes["Text"], options: MessageOptions): Promise<void>;
     reply(content: MessageTypes["Text"], options: MessageOptions): Promise<void>;
     info(): Promise<Group>
@@ -205,7 +209,7 @@ export class APIMessage {
     public sent_by: string;
     private client_key: WhatsappJS["client_key"];
 
-    checkNumber(phone_number: PhoneTypes["Receiver"]): Promise<string | boolean | CheckNumberResponse>;
+    checkNumber(phone_number: PhoneTypes["Receiver"]): Promise<CheckNumberTypes>;
     sendMessage(to: PhoneTypes["Receiver"], text: MessageTypes["Text"], options: MessageOptions): Promise<void>;
 }
 
@@ -221,6 +225,6 @@ export class AgentMessage {
     public sent_by: string;
     private client_key: WhatsappJS["client_key"];
 
-    checkNumber(phone_number: PhoneTypes["Receiver"]): Promise<string | boolean | CheckNumberResponse>;
+    checkNumber(phone_number: PhoneTypes["Receiver"]): Promise<CheckNumberTypes>;
     sendMessage(to: PhoneTypes["Receiver"], text: MessageTypes["Text"], options: MessageOptions): Promise<void>;
 }

@@ -172,6 +172,8 @@ export class WhatsappJS extends EventEmitter {
 
                 res.sendStatus(200);
             });
+
+            return config;
         } catch (e) {
             console.error(e);
         }
@@ -217,7 +219,7 @@ export class WhatsappJS extends EventEmitter {
             const res = await axios(config);
         
             if(!res.data.is_valid) {
-                return "Invalid phone number!";
+                return "invalid_phone_number";
             } else if(!res.data.on_whatsapp) {
                 return false;
             } else {
@@ -267,6 +269,28 @@ export class WhatsappJS extends EventEmitter {
         let findGroup = groups.filter((group) => group.uuid == uuid);
 
         return findGroup[0];
+    }
+
+    async getGroups() {
+        var data = '';
+
+        var config = {
+            method: 'get',
+            url: `https://api.p.2chat.io/open/whatsapp/groups/${this.client_phone}`,
+            headers: { 
+                'X-User-API-Key': this.client_key
+            },
+            data : data
+        };
+
+        const request = await axios(config)
+            .catch(function (error) {
+                console.log(error);
+            });
+
+        let groups = request.data.data;
+
+        return groups;
     }
 }
 
