@@ -67,12 +67,35 @@ export type WebhookEvents =
   | "whatsapp.group.remove";
 
 export interface WebhookConfig {
+    /**
+     * @description Web Port (Default: 3000)
+     * @default port: 3000
+     */
   port: number;
+  /**
+   * @description Path to POST webhook events (default: /webhooks/whatsapp)
+   * @default path: "/webhooks/whatsapp"
+   */
   path: string;
+  /**
+   * @description Your server hostname or the connection address from a service provider such as ngrok. For example: https://<your_url>.ngrok-free.app
+   * @example host_name: "https://<your_url>.ngrok-free.app"
+   */
   host_name: string;
+  /**
+   * @description Adds the events you want to listen to to the webhook. You can read the 2Chat API Documentation to learn more about events: https://developers.2chat.co/docs/API/WhatsApp/webhooks/subscribe
+   */
   events: WebhookEvents[];
   public: {
+    /**
+     * @description The name under which your public file will be published and publicly visible on the web server.
+     * @example name: "/public"
+     */
     name: string;
+    /**
+     * @description The path to your public file, i.e. the file that will be published publicly. For example: C:/path/to/public
+     * @example path: "C:/path/to/public"
+     */
     path: string;
   };
 }

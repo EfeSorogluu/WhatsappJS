@@ -133,7 +133,7 @@ client.start();
 
 ```
 
-### Public Directory Section
+## Public Directory Section
 
 You can listen to the public folder by specifying a public object in the webhookListener function. With this feature, you can make your transfers from your public folder without requiring an additional intermediate server when sending images, files, etc. over whatsapp.
 
